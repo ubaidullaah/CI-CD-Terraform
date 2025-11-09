@@ -1,0 +1,44 @@
+name: tf plan prod
+
+on:
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - "envs/prod/**"
+      - "modules/**"
+      - ".github/workflows/tf-plan-prod.yml"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: envs/prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+      - name: Terraform init
+        run: terraform init
+      - name: Terraform validate
+        run: terraform validate
+      - name: Terraform plan
+        run: terraform plan -no-color | tee plan.out
+      - name: Comment plan on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: tf-plan-prod
+          path: envs/prod/plan.out

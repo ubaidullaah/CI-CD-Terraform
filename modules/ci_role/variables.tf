@@ -1,0 +1,10 @@
+variable "project_name"   { type = string }
+variable "env"            { type = string }
+variable "repo_owner"     { type = string }
+variable "repo_name"      { type = string }
+variable "oidc_provider_arn" { type = string }  # arn of iam oidc provider for token.actions.githubusercontent.com
+variable "state_bucket"   { type = string }     # example terraform-state-glue-dev
+variable "lock_table"     { type = string }     # example terraform-locks-glue-dev
+variable "region"         { type = string }     # example us-east-1
+variable "account_id"     { type = string }     # aws account id
+variable "tags"           { type = map(string) }

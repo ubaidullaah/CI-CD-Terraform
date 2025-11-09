@@ -1,0 +1,21 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# keep the lock file tracked
+!.terraform.lock.hcl
+# Plans
+*.plan
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
