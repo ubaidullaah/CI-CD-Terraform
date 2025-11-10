@@ -8,33 +8,43 @@ on:
       - "modules/**"
       - ".github/workflows/tf-plan-dev.yml"
 
-env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
-
 jobs:
   plan:
     runs-on: ubuntu-latest
+    environment: dev      # required so ${{ vars.AWS_REGION }} resolves
     defaults:
       run:
         working-directory: envs/dev
+
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
+
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
+
       - name: Terraform fmt
         run: terraform fmt -check -recursive
+
       - name: Terraform init
         run: terraform init
+
       - name: Terraform validate
         run: terraform validate
+
       - name: Terraform plan
         run: terraform plan -no-color | tee plan.out
+
       - name: Comment plan on PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
