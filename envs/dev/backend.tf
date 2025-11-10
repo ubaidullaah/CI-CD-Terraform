@@ -6,3 +6,5 @@ terraform {
     dynamodb_table = "terraform-locks-glue-dev"
   }
 }
+
+# Trigger test plan
