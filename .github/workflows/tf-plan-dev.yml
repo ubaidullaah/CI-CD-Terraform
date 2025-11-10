@@ -11,7 +11,7 @@ on:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    environment: dev      # required so ${{ vars.AWS_REGION }} resolves
+    environment: dev
     defaults:
       run:
         working-directory: envs/dev
@@ -19,6 +19,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
+      issues: write
 
     steps:
       - uses: actions/checkout@v4
@@ -32,8 +34,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}
           aws-region: ${{ vars.AWS_REGION }}
-
-
 
       - name: Terraform init
         run: terraform init
