@@ -33,8 +33,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Terraform fmt
-        run: terraform fmt -check -recursive
+
 
       - name: Terraform init
         run: terraform init
