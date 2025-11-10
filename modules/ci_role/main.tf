@@ -52,11 +52,27 @@ resource "aws_iam_policy" "state_access" {
 # Permissions for resources managed by this repo
 # keep least privilege but allow creating and updating the glue role and buckets this stack names
 data "aws_iam_policy_document" "managed_resources" {
+  # iam for the CI role itself (needed for self-management)
+  statement {
+    actions = [
+      "iam:GetRole","iam:ListAttachedRolePolicies","iam:ListRolePolicies",
+      "iam:GetPolicy","iam:GetPolicyVersion","iam:ListPolicyVersions",
+      "iam:CreateRole","iam:DeleteRole","iam:UpdateRole",
+      "iam:AttachRolePolicy","iam:DetachRolePolicy","iam:PutRolePolicy","iam:DeleteRolePolicy",
+      "iam:CreatePolicy","iam:DeletePolicy","iam:TagRole","iam:TagPolicy"
+    ]
+    resources = [
+      "arn:aws:iam::${var.account_id}:role/${local.role_name}",
+      "arn:aws:iam::${var.account_id}:policy/${var.project_name}-gha-*"
+    ]
+  }
+
   # iam for the glue execution role this stack manages
   statement {
     actions = [
       "iam:CreateRole","iam:DeleteRole","iam:GetRole","iam:PassRole",
-      "iam:AttachRolePolicy","iam:DetachRolePolicy","iam:PutRolePolicy","iam:DeleteRolePolicy","iam:ListRolePolicies"
+      "iam:AttachRolePolicy","iam:DetachRolePolicy","iam:PutRolePolicy","iam:DeleteRolePolicy","iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies"
     ]
     resources = ["arn:aws:iam::${var.account_id}:role/${var.project_name}-glue-role-${var.env}"]
   }
@@ -73,7 +89,8 @@ data "aws_iam_policy_document" "managed_resources" {
   statement {
     actions   = [
       "s3:CreateBucket","s3:DeleteBucket","s3:PutBucketVersioning","s3:PutEncryptionConfiguration",
-      "s3:PutBucketPolicy","s3:PutBucketTagging","s3:GetBucketLocation","s3:ListBucket"
+      "s3:PutBucketPolicy","s3:GetBucketPolicy","s3:PutBucketTagging","s3:GetBucketLocation","s3:ListBucket",
+      "s3:GetBucketVersioning","s3:GetEncryptionConfiguration"
     ]
     resources = ["*"]
     condition {
